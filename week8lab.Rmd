@@ -61,3 +61,45 @@ leaflet(oil_sf) %>%
 
 ```
 
+##Make a TMap plot with the Texas State shapefile
+
+```{r}
+
+states <- st_read(dsn = ".", layer = "states") #read in a shape file using simplefeatures (sf)
+
+tex_border <- states %>% 
+  filter(STATE_NAME == "Texas") %>% 
+  st_transform(4326)
+
+
+plot(tex_border)
+
+
+tm_shape(tex_border)+
+  tm_polygons()+
+  tm_shape(oil_sf)+
+  tm_dots(size = 0.3)
+
+```
+
+##Spatial Analysis
+Are these points of oil spill spatially biased?
+
+Convert the data into spatial points patterns.  This is a combination of the point data and the bounding window.
+
+
+```{r}
+
+spill_sp <- as(oil_sf, "Spatial") #converts from simple feature back to dataframe.
+
+spill_ppp <- as(spill_sp, "ppp") #convert the Satial Dataframe that was just created into a point pattern p.
+
+
+tx_sp <- as(tex_border, "Spatial") #convert the texas boarder to a spatial frame to make the window for analysis
+
+tex_owin <- as(tx_sp, "owin") #conert the spatial frame of texas boarder and think of it as the outerwindow (owin)
+
+all_ppp <- ppp(spill_ppp$x, spill_ppp$y, window = tex_owin)
+
+```
+
