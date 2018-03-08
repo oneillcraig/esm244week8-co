@@ -1,0 +1,42 @@
+---
+title: "Week 8 Lab - GitHub Tutorial"
+author: "Craig"
+date: "March 8, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(sf)
+library(tmap)
+library(leaflet)
+library(spatstat)
+library(maptools)
+
+
+
+```
+
+##Column Graph of Texas Oil Spills
+
+```{r}
+
+oil_spills <- read_csv("oil_spills.csv")
+
+
+df <- oil_spills %>% 
+  filter(`Accident State` == "TX" & `Accident Year` < 2017) %>%  #filter the data to just be from Texas AND the year is less than 2017
+  group_by(`Accident Year`) %>%   #Group the data by accident year.
+  summarise(Loss = sum(`Net Loss (Barrels)`)) #Provide a summary of the net loss of barrels per group of years.
+
+
+colnames(df) <- c("Year", "Loss")
+
+ggplot(df, aes(x=Year, y=Loss))+
+  geom_col()
+```
+
