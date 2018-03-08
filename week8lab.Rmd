@@ -40,3 +40,24 @@ ggplot(df, aes(x=Year, y=Loss))+
   geom_col()
 ```
 
+Stage -> Commit -> Push
+
+##Leaflet Plot of Spill Locations in Texas in 2016
+
+```{r}
+
+df_loc <- oil_spills %>% 
+  filter(`Accident State` == "TX" & `Accident Year` == 2016) %>% 
+  select(Latitude, Longitude, `Net Loss (Barrels)`)
+
+
+colnames(df_loc) <- c("latitude", "longitude", "net_loss")
+
+oil_sf <- st_as_sf(df_loc, coords = c("longitude", "latitude"), crs = 4326) #convert a dataframe into a simplefeatures spatial data.  identify the long and lat in the datafram and setting the coordinate reference system (crs) to WGS (code is 4326)
+
+leaflet(oil_sf) %>% 
+  addTiles() %>% 
+  addMarkers()
+
+```
+
