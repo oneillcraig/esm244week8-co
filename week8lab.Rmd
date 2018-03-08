@@ -103,3 +103,14 @@ all_ppp <- ppp(spill_ppp$x, spill_ppp$y, window = tex_owin)
 
 ```
 
+###A Density Plot
+Kernel density plots for overlapping areas become super easy and looks really dangerously awesome.
+
+Takes point pattern
+
+```{r}
+plot(density(all_ppp, sigma = 0.4))
+
+
+```
+
