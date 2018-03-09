@@ -114,3 +114,76 @@ plot(density(all_ppp, sigma = 0.4))
 
 ```
 
+###Quadrat Test for Spatial Evenness
+
+This does not test for randomness.  It tests to see if data is evenly distributed spatially.  Thats different from random!
+
+
+```{r}
+oil_qt <- quadrat.test(all_ppp, nx = 5, ny = 5) #nx is the number of "regions" you want horizantally, ny is the number of regions you want vertically.  ie the grids
+
+oil_qt
+```
+
+This preforms a hypothesis test where the null hypothesis is that the data is CSR (or evenly distributed).  Since the p value is so low, we can reject the null and say "The Data is not evenly distributed!"
+
+
+
+```{r}
+
+plot(all_ppp)
+plot(oil_qt, add = TRUE, cex = 0.4)
+```
+
+The numbers in the quadrat tells you:
+1.  The number of expected events within each quadrat that you would expect if the data were fully even.For partial quadrats, it calculates the proportional number of counts expected for the incomplete quadrats based on area.
+2.  The actual number of counts per region
+3.  Standardized measure of how different the actual count is to the expected count.
+
+
+
+###G-Function for Nearest Neighbor Analysis
+
+```{r}
+lag <- seq(0,1, by=0.01)
+
+oil_gfun <- envelope(all_ppp, fun = Gest, r = lag, nsim = 100) #Find the nearest neighbor given increments of distance, our r.
+
+
+
+```
+The r column is the distance from each point.  The obs is the
+
+```{r}
+ggplot(oil_gfun, aes(x = r, y = obs))+ #the actual gfunction values from the oilspill data
+  geom_line(color = "black")+
+  geom_line(aes(x = r, y = theo), color = "red")
+```
+
+
+
+Our observed data has a higher proporiton of point pairs with nearest neighbors at shorter distances compared to csr data.  On average our data has nearest neighbors that are closer than we'd expect for randomly distributed data.
+
+This is because the black part is above the red line. The black line is the observations, the red line is the "theoretical", or model driven version.
+
+
+##Nearest Neighbor using the L-Function (Ripley's K standardized)
+But what if we consider not just a single nearest neighbor, but rather consider a function of clusters of data.  OH BOY lets use the L-Function
+
+```{r}
+
+lag2 <- seq(0,3, by = 0.5) #this is a large increment for the sake of time in lab
+
+
+oil_lfun <- envelope(all_ppp, fun = Lest, r = lag2, nsim = 20, global = TRUE) #this is not just finding a single nearest neighbor, but finds increasing bubbles around each point until it contains all observations.
+
+
+ggplot(oil_lfun, aes(x = lag2, y = obs))+
+  geom_line(color = "black")+
+  geom_line(aes(x = lag2, y = theo), color = "blue")
+
+```
+
+OUr blue line is beneath our observation line indicating that the nearest neighbor is closer than farther away.  Same result as the previous one cause its the same data.
+
+
